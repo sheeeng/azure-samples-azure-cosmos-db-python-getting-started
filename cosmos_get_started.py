@@ -2,10 +2,11 @@ from azure.cosmos.aio import CosmosClient as cosmos_client
 from azure.cosmos import PartitionKey, exceptions
 import asyncio
 import family
+import os
 
 # <add_uri_and_key>
-endpoint = "<Your Cosmos DB Resource URI>"
-key = "<Your Cosmos DB Resource PRIMARY KEY>"
+endpoint = os.environ['URI']
+key = os.environ['KEY']
 # </add_uri_and_key>
 
 
@@ -24,14 +25,14 @@ async def get_or_create_db(client, database_name):
         print("Creating database")
         return await client.create_database(database_name)
 # </create_database_if_not_exists>
-    
+
 # Create a container
 # Using a good partition key improves the performance of database operations.
 # <create_container_if_not_exists>
 async def get_or_create_container(database_obj, container_name):
-    try:        
+    try:
         todo_items_container = database_obj.get_container_client(container_name)
-        await todo_items_container.read()   
+        await todo_items_container.read()
         return todo_items_container
     except exceptions.CosmosResourceNotFoundError:
         print("Creating container with lastName as partition key")
@@ -42,7 +43,7 @@ async def get_or_create_container(database_obj, container_name):
     except exceptions.CosmosHttpResponseError:
         raise
 # </create_container_if_not_exists>
-    
+
 # <method_populate_container_items>
 async def populate_container_items(container_obj, items_to_create):
     # Add items to the container
@@ -96,13 +97,13 @@ async def run_sample():
             # generate some family items to test create, read, delete operations
             family_items_to_create = [family.get_andersen_family_item(), family.get_johnson_family_item(), family.get_smith_family_item(), family.get_wakefield_family_item()]
             # populate the family items in container
-            await populate_container_items(container_obj, family_items_to_create)  
+            await populate_container_items(container_obj, family_items_to_create)
             # read the just populated items using their id and partition key
             await read_items(container_obj, family_items_to_create)
-            # Query these items using the SQL query syntax. 
+            # Query these items using the SQL query syntax.
             # Specifying the partition key value in the query allows Cosmos DB to retrieve data only from the relevant partitions, which improves performance
             query = "SELECT * FROM c WHERE c.lastName IN ('Wakefield', 'Andersen')"
-            await query_items(container_obj, query)                 
+            await query_items(container_obj, query)
         except exceptions.CosmosHttpResponseError as e:
             print('\nrun_sample has caught an error. {0}'.format(e.message))
         finally:
@@ -114,16 +115,3 @@ if __name__=="__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run_sample())
 # <python_main>
-
-    
-
-
-
-
-
-
-
-
-
-
-
