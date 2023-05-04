@@ -5,14 +5,14 @@ import family
 import os
 
 # <add_uri_and_key>
-endpoint = os.environ['URI']
-key = os.environ['KEY']
+endpoint = os.environ['COSMOS_DB_ACCOUNT_URI']
+key = os.environ['COSMOS_DB_ACCOUNT_KEY']
 # </add_uri_and_key>
 
 
 # <define_database_and_container_name>
-database_name = 'AzureSampleFamilyDatabase'
-container_name = 'FamilyContainer'
+database_name = 'DatabasePython'
+container_name = 'ContainerPython'
 # </define_database_and_container_name>
 
 # <create_database_if_not_exists>
@@ -35,10 +35,10 @@ async def get_or_create_container(database_obj, container_name):
         await todo_items_container.read()
         return todo_items_container
     except exceptions.CosmosResourceNotFoundError:
-        print("Creating container with lastName as partition key")
+        print("Creating container with id as partition key")
         return await database_obj.create_container(
             id=container_name,
-            partition_key=PartitionKey(path="/lastName"),
+            partition_key=PartitionKey(path="/id"),
             offer_throughput=400)
     except exceptions.CosmosHttpResponseError:
         raise
@@ -61,9 +61,9 @@ async def read_items(container_obj, items_to_read):
     # Read items (key value lookups by partition key and id, aka point reads)
     # <read_item>
     for family in items_to_read:
-        item_response = await container_obj.read_item(item=family['id'], partition_key=family['lastName'])
+        item_response = await container_obj.read_item(item=family['id'], partition_key=family['id'])
         request_charge = container_obj.client_connection.last_response_headers['x-ms-request-charge']
-        print('Read item with id {0}. Operation consumed {1} request units'.format(item_response['id'], (request_charge)))
+        print('Read item with id {0}. Operation consumed {1} request units.'.format(item_response['id'], (request_charge)))
     # </read_item>
 # </method_read_items>
 
@@ -80,9 +80,29 @@ async def query_items(container_obj, query_text):
     )
     request_charge = container_obj.client_connection.last_response_headers['x-ms-request-charge']
     items = [item async for item in query_items_response]
-    print('Query returned {0} items. Operation consumed {1} request units'.format(len(items), request_charge))
+    print('Query returned {0} items. Operation consumed {1} request units.'.format(len(items), request_charge))
     # </query_items>
 # </method_query_items>
+
+# For small workloads, the item ID is a suitable choice for the partition key.
+# The partition key is used to automatically distribute data across partitions for scalability. Choose a property in your JSON document that has a wide range of values and evenly distributes request volume. For small read-heavy workloads or write-heavy workloads of any size, id is often a good choice.
+
+# https://github.com/Azure/azure-sdk-for-python/blob/d2a457d2007cb1d4aa4c4c6e8f2591de4ab87b63/sdk/cosmos/azure-cosmos/samples/examples_async.py#LL121C9-L130C29
+async def delete_items(container_obj):
+    # Delete items from the container.
+    # The Cosmos DB SQL API does not support 'DELETE' queries,
+    # so deletes must be done with the delete_item method
+    # on the container.
+    # [START delete_items]
+    async for item in container_obj.query_items(
+        query='SELECT * FROM c WHERE NOT IS_NULL(c.id)',
+        enable_cross_partition_query=True
+    ):
+        await container_obj.delete_item(item, partition_key=item["id"])
+        request_charge = container_obj.client_connection.last_response_headers['x-ms-request-charge']
+        print('Delete item with id {0}. Operation consumed {1} request units.'.format(item['id'], (request_charge)))
+    # [END delete_items]
+
 
 # <run_sample>
 async def run_sample():
@@ -104,6 +124,8 @@ async def run_sample():
             # Specifying the partition key value in the query allows Cosmos DB to retrieve data only from the relevant partitions, which improves performance
             query = "SELECT * FROM c WHERE c.lastName IN ('Wakefield', 'Andersen')"
             await query_items(container_obj, query)
+
+            # await delete_items(container_obj)
         except exceptions.CosmosHttpResponseError as e:
             print('\nrun_sample has caught an error. {0}'.format(e.message))
         finally:

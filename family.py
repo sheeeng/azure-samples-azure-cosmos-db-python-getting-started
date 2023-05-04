@@ -9,11 +9,13 @@ def get_andersen_family_item():
     'parents': [
         {
             'familyName': None,
-            'firstName': 'Thomas'
+            'firstName': 'Thomas',
+            'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
         },
         {
             'familyName': None,
-            'firstName': 'Mary Kay'
+            'firstName': 'Mary Kay',
+            'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
         }
     ],
     'children': None,
@@ -34,11 +36,13 @@ def get_wakefield_family_item():
         'parents': [
             {
                 'familyName': 'Wakefield',
-                'firstName': 'Robin'
+                'firstName': 'Robin',
+                'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
             },
             {
                 'familyName': 'Miller',
-                'firstName': 'Ben'
+                'firstName': 'Ripley',
+                'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
             }
         ],
         'children': [
@@ -54,14 +58,16 @@ def get_wakefield_family_item():
                     {
                         'givenName': 'Shadow'
                     }
-                ]
+                ],
+                'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
             },
             {
                 'familyName': 'Miller',
                 'firstName': 'Lisa',
                 'gender': 'female',
                 'grade': 1,
-                'pets': None
+                'pets': None,
+                'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
             }
         ],
         'address': {
@@ -78,7 +84,8 @@ def get_smith_family_item():
     'id': 'Johnson_' + str(uuid.uuid4()),
     'lastName': 'Johnson',
     'district': None,
-    'registered': False
+    'registered': False,
+    'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
     }
     return smith_item
 
@@ -91,7 +98,8 @@ def get_johnson_family_item():
     'address': {
         'state': 'WA',
         'city': 'Redmond'
-    },   
-    'registered': True
+    },
+    'registered': True,
+    'description': 'Å å Ø ø Æ æ 葉繼問 イップ・マン 엽문'
     }
     return johnson_item

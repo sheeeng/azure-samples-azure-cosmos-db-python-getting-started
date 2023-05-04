@@ -24,13 +24,21 @@ pip install aiohttp azure-cosmos
 - Create `.envrc` file with the following similar content.
 
 ```shell
-URI='CHANGEME_AZURE_COSMOS_ACCOUNT_URI'
-KEY='CHANGEME_AZURE_COSMOS_ACCOUNT_KEY'
+COSMOS_DB_ACCOUNT_URI='CHANGEME_COSMOS_DB_ACCOUNT_URI'
+COSMOS_DB_ACCOUNT_KEY='CHANGEME_COSMOS_DB_ACCOUNT_KEY'
 ```
 
-- Manually create `FamilyContainer` container under `AzureSampleFamilyDatabase` database inside Azure Portal due to this [issue](https://github.com/Azure/azure-cosmos-dotnet-v2/issues/861).
+- Manually create `ContainerPython` container under `DatabasePython` database inside Azure Portal due to this [issue](https://github.com/Azure/azure-cosmos-dotnet-v2/issues/861) with the following error message.
 
-# Developing a Python app using Azure Cosmos DB
+```text
+run_sample has caught an error. (BadRequest) Setting offer throughput or autopilot on container is not supported for serverless accounts.
+ActivityId: 722d3c33-b6b6-4f6a-a749-f171d7a1e4ec, Microsoft.Azure.Documents.Common/2.14.0
+Code: BadRequest
+Message: Setting offer throughput or autopilot on container is not supported for serverless accounts.
+ActivityId: 722d3c33-b6b6-4f6a-a749-f171d7a1e4ec, Microsoft.Azure.Documents.Common/2.14.0
+```
+
+## Developing a Python app using Azure Cosmos DB
 
 Azure Cosmos DB is Microsoft’s globally distributed multi-model database service. One of the supported APIs is the SQL API, which provides a JSON document model with SQL querying and JavaScript procedural logic. This sample shows you how to use the Azure Cosmos DB with the SQL API to store and access data from a Python application.
 
